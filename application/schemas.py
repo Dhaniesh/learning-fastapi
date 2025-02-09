@@ -16,3 +16,8 @@ class UserOut(BaseModel):
 class Post(BaseModel):
     title: str
     content: str
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
