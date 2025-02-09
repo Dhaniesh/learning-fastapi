@@ -20,7 +20,7 @@ def get_post(post_id: int, db: Session = Depends(get_db), get_current_user=Depen
 
 @router.get("/", response_model=schemas.PostList)
 def get_posts(db: Session = Depends(get_db), get_current_user=Depends(oauth2.get_current_user)):
-    posts = db.query(models.Post).all()
+    posts = db.query(models.Post).filter(models.Post.user_id == get_current_user.id).all()
     return {"data": posts}
 
 
