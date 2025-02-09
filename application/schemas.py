@@ -14,9 +14,15 @@ class UserOut(BaseModel):
     created_at: datetime
 
 
+class PostIn(BaseModel):
+    title: str
+    content: str
+
+
 class Post(BaseModel):
     title: str
     content: str
+    user_id: int
 
 
 class PostList(BaseModel):
