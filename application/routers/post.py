@@ -1,7 +1,8 @@
-from .. import models, schemas
+from .. import models, schemas, oauth2
 from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException, status
 from ..database import get_db
+from typing import List
 
 from fastapi import APIRouter
 
@@ -12,19 +13,19 @@ router = APIRouter(
 
 
 @router.get("/{post_id}", response_model=schemas.Post)
-def get_post(post_id: int, db: Session = Depends(get_db)):
+def get_post(post_id: int, db: Session = Depends(get_db), get_current_user=Depends(oauth2.get_current_user)):
     post = db.query(models.Post).filter(models.Post.id == post_id).first()
     return post
 
 
-@router.get("/", response_model=list[schemas.Post])
-def get_posts(db: Session = Depends(get_db)):
+@router.get("/", response_model=schemas.PostList)
+def get_posts(db: Session = Depends(get_db), get_current_user=Depends(oauth2.get_current_user)):
     posts = db.query(models.Post).all()
     return {"data": posts}
 
 
 @router.delete("/{post_id}")
-def delete_post(post_id: int, db: Session = Depends(get_db)):
+def delete_post(post_id: int, db: Session = Depends(get_db), get_current_user=Depends(oauth2.get_current_user)):
     post = db.query(models.Post).filter(models.Post.id == post_id).first()
     if post is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail=f"Post with {post_id} not found")
@@ -34,7 +35,7 @@ def delete_post(post_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{post_id}", response_model=schemas.Post)
-def update_post(post_id: int, updated_post: schemas.Post, db: Session = Depends(get_db)):
+def update_post(post_id: int, updated_post: schemas.Post, db: Session = Depends(get_db), get_current_user=Depends(oauth2.get_current_user)):
     post_query = db.query(models.Post).filter(models.Post.id == post_id)
     post = post_query.first()
     if post is None:
@@ -45,8 +46,8 @@ def update_post(post_id: int, updated_post: schemas.Post, db: Session = Depends(
 
 
 @router.post("/", response_model=schemas.Post)
-def create_post(post: schemas.Post, db: Session = Depends(get_db)):
-    # Create new post using SQLAlchemy model
+def create_post(post: schemas.Post, db: Session = Depends(get_db), get_current_user=Depends(oauth2.get_current_user)):
+    print(get_current_user)
     new_post = models.Post(**post.model_dump())  # Changed from Post to models.Post
     db.add(new_post)
     db.commit()

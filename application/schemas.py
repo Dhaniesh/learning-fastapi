@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from typing import Optional
 from datetime import datetime
 
 
@@ -18,6 +19,14 @@ class Post(BaseModel):
     content: str
 
 
+class PostList(BaseModel):
+    data: list[Post]
+
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
+
+class TokenData(BaseModel):
+    id: Optional[int] = None
