@@ -23,6 +23,7 @@ class Post(BaseModel):
     title: str
     content: str
     user_id: int
+    user: UserOut
 
 
 class PostList(BaseModel):
