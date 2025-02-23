@@ -1,8 +1,9 @@
 from .. import models, schemas, oauth2
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from fastapi import Depends, HTTPException, status
 from ..database import get_db
-from typing import List
+from typing import Any, List
 
 from fastapi import APIRouter
 
@@ -12,17 +13,44 @@ router = APIRouter(
 )
 
 
-@router.get("/{post_id}", response_model=schemas.Post)
+@router.get("/{post_id}", response_model=schemas.PostOut)
 def get_post(post_id: int, db: Session = Depends(get_db), get_current_user=Depends(oauth2.get_current_user)):
-    post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    post = db.query(
+        models.Post,
+        func.count(models.Vote.post_id).label("votes")
+    ).join(
+        models.Vote,
+        models.Vote.post_id == models.Post.id,
+        isouter=True
+    ).group_by(
+        models.Post.id
+    ).where(models.Post.id == post_id).first()
     return post
 
 
-@router.get("/", response_model=schemas.PostList)
+@router.get("/", response_model=List[schemas.PostOut])
 def get_posts(db: Session = Depends(get_db), get_current_user=Depends(oauth2.get_current_user),
               limit: int = 10, skip: int = 0):
-    posts = db.query(models.Post).filter(models.Post.user_id == get_current_user.id).offset(skip).limit(limit).all()
-    return {"data": posts}
+    results = []
+    posts_votes = db.query(
+        models.Post,
+        func.count(models.Vote.post_id).label("votes")
+    ).join(
+        models.Vote,
+        models.Vote.post_id == models.Post.id,
+        isouter=True
+    ).group_by(
+        models.Post.id
+    ).offset(skip).limit(limit).all()
+
+    for post, votes in posts_votes:
+        post_dict = {
+            "Post": post,
+            "votes": votes
+        }
+        results.append(post_dict)
+
+    return results
 
 
 @router.delete("/{post_id}")
