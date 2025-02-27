@@ -2,3 +2,4 @@
 /practice
 .history
 __pycache__/
+.env
