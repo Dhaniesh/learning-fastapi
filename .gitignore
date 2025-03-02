@@ -2,3 +2,5 @@
 /practice
 .history
 __pycache__/
+.env
+/practice_py
