@@ -35,7 +35,7 @@ async def log_requests(request: Request, call_next):
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Hello World!!!"}
 
 app.include_router(post.router)
 app.include_router(user.router)
