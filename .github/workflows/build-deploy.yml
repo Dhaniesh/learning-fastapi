@@ -1,8 +1,11 @@
-name: GitHub Actions Demo
-on:
-    pull_request:
-jobs:
-    explore-github-actions:
-        runs-on: ubuntu-latest
-        steps:
-            - run: echo "Deploying to development sever $GITHUB_REF"
+# name: GitHub Actions Demo
+# on:
+#     pull_request:
+# jobs:
+#     commit-check:
+#         runs-on: ubuntu-latest
+#         steps:
+#             - run: echo "Deployment started"
+#             - name: Setup python
+#               uses: actions/setup-python@v5
+#             - run: pip install pytest
